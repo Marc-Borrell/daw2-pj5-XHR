@@ -1,49 +1,44 @@
-
 :root {
-    --sala1-jugador1:    #df467e;
-    --sala1-jugador2:     #58dc20;
-    --sala2-jugador1:    #ff712a;
-    --sala2-jugador2:     #2091dc;
-    --sala3-jugador1:    #d3ff22;
-    --sala3-jugador2:     #6820dc;
-
+    --sala1-jugador1: #ff8e00;
+    --sala1-jugador2: #2a10d8;
+    --sala2-jugador1: #e44ea3;
+    --sala2-jugador2: #7cf072;
+    --sala3-jugador1: #fffa2e;
+    --sala3-jugador2: #724cfb;
 }
 
 body {
-  padding: 50px;
-  font: 30px "Lucida Grande", Helvetica, Arial, sans-serif;
+    padding: 50px;
+    font:
+        30px "Lucida Grande",
+        Helvetica,
+        Arial,
+        sans-serif;
 }
 
 a {
-  color: #00B7FF;
+    color: #00b7ff;
 }
 
-
-.sala1-j1{
-
-  background-color: var(--sala1-jugador1)
+.sala1-j1 {
+    background-color: var(--sala1-jugador1);
 }
 
-.sala1-j2{
-
-  background-color: var(--sala1-jugador2)
+.sala1-j2 {
+    background-color: var(--sala1-jugador2);
 }
 
-.sala2-j1{
-
-  background-color: var(--sala2-jugador1)
+.sala2-j1 {
+    background-color: var(--sala2-jugador1);
 }
 
-.sala2-j2{
-
-  background-color: var(--sala2-jugador2)
+.sala2-j2 {
+    background-color: var(--sala2-jugador2);
 }
-.sala3-j1{
-
-  background-color: var(--sala3-jugador1)
+.sala3-j1 {
+    background-color: var(--sala3-jugador1);
 }
 
-.sala3-j2{
-
-  background-color: var(--sala3-jugador2)
+.sala3-j2 {
+    background-color: var(--sala3-jugador2);
 }
