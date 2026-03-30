@@ -1,39 +1,7 @@
-
+//Modificamos la manera en la que creamos la tabla para poder acceder a las filas y las columnas con dataset
 table.-tablaEntera(width='100%', align='center', cellspacing='0', cellpadding='10', border='2')
-  tr 
-    th.-cell#A1
-    th.-cell#A2
-    th.-cell#A3
-    th.-cell#A4
-    th.-cell#A5
-  tr 
-    td.-cell#B1
-    td.-cell#B2
-    td.-cell#B3
-    td.-cell#B4
-    td.-cell#B5
-  tr 
-    td.-cell#C1
-    td.-cell#C2 
-    td.-cell#C3
-    td.-cell#C4
-    td.-cell#C5
-  tr
-    td.-cell#D1
-    td.-cell#D2 
-    td.-cell#D3
-    td.-cell#D4
-    td.-cell#D5
-  tr
-    td.-cell#E1
-    td.-cell#E2 
-    td.-cell#E3
-    td.-cell#E4
-    td.-cell#E5
-  tr
-    td.-cell#F1
-    td.-cell#F2
-    td.-cell#F3
-    td.-cell#F4
-    td.-cell#F5
-    
+  - const filas = ['A','B','C','D','E','F']
+  each fila, i in filas
+    tr
+      each col, j in [0,1,2,3,4]
+        td.-cell(id=`${fila}${j+1}` data-row=i data-col=j)
