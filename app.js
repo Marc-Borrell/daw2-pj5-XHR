@@ -27,6 +27,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/joc', jocRouter);
 
+
 app.use(function(req, res, next) {
   next(createError(404));
 });

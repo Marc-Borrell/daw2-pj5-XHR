@@ -1,8 +1,21 @@
 const IdJugador = prompt("Introdueix el ID de jugador");
 let IdSala = null;
-let pollingInterval = null; 
+let pollingInterval = null;
+let ultimaSalaConocida = null;
+let fiDeJocGestionat = false;
+
+function habilitarTabla(habilitat) {
+  const t = document.querySelector('table');
+  if (!t) return;
+  t.style.pointerEvents = habilitat ? 'auto' : 'none';
+  t.style.opacity = habilitat ? '1' : '0.4';
+}
 
 function unirseSala() {
+  fiDeJocGestionat = false;
+  ultimaSalaConocida = null;
+  habilitarTabla(false);
+
   const xhr = new XMLHttpRequest();
   xhr.open("POST", "/joc/join");
   xhr.setRequestHeader("Content-Type", "application/json");
@@ -13,7 +26,8 @@ function unirseSala() {
     IdSala = sala.id;
     renderTabla(sala.tabla);
     actualizarPuntuaciones(sala.puntuacions);
-    iniciarPolling(); 
+    habilitarTabla(true);
+    iniciarPolling();
   };
 
   xhr.onerror = () => alert("Error de xarxa");
@@ -21,14 +35,14 @@ function unirseSala() {
 }
 
 function moverCelda(fila, col) {
-  if (!IdSala) return alert("No estàs en cap sala");
+  if (!IdSala) return;
 
   const xhr = new XMLHttpRequest();
   xhr.open("POST", "/joc/move");
   xhr.responseType = "json";
   xhr.setRequestHeader("X-Jugador-Id", IdJugador);
   xhr.setRequestHeader("X-Sala-Id", IdSala);
-  xhr.setRequestHeader("Content-Type", "application/octet-stream"); // MIME per a fitxers binaris desconeguts
+  xhr.setRequestHeader("Content-Type", "application/octet-stream");
 
   xhr.onload = () => {
     if (xhr.status !== 200) return alert("Error al fer el moviment");
@@ -36,6 +50,7 @@ function moverCelda(fila, col) {
     if (data.exit) {
       renderTabla(data.tabla);
       actualizarPuntuaciones(data.puntuacions);
+      gestionarFiDeJoc(data); //comprovar guanyador després de cada move
     } else {
       alert("Cel·la ja ocupada!");
     }
@@ -48,30 +63,79 @@ function moverCelda(fila, col) {
   xhr.send(buffer);
 }
 
-function iniciarPolling() {  
-  pollingInterval = setInterval(() => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", `/joc/state/${IdSala}`);
-    xhr.responseType = "json";
+function iniciarPolling() {
+  pollingInterval = setInterval(async () => {
+    try {
+      const resp = await fetch(`/joc/state/${IdSala}?t=${Date.now()}`);
+      
+      if (resp.status === 404) {
+        clearInterval(pollingInterval);
+        //Si teníamos sala con guanyador, mostrarla igualmente
+        if (ultimaSalaConocida?.guanyador) {
+          gestionarFiDeJoc(ultimaSalaConocida);
+        }
+        return;
+      }
 
-    xhr.onload = () => {
-      if (xhr.status !== 200) return;
-      const sala = xhr.response;
+      if (!resp.ok) return;
+
+      const sala = await resp.json();
+      console.log(`POLL guanyador=${sala?.guanyador} fiDeJocGestionat=${fiDeJocGestionat}`);
+      if (!sala) return;
+
+      ultimaSalaConocida = sala;  // guardar siempre la última sala
       renderTabla(sala.tabla);
       actualizarPuntuaciones(sala.puntuacions);
+      gestionarFiDeJoc(sala);
 
-      if (sala.guanyador) {
-        clearInterval(pollingInterval);
-        alert(`Ha guanyat: ${sala.guanyador}`);
-      }
-    };
-
-    xhr.send();
+    } catch (e) {
+      console.error('Error polling:', e);
+    }
   }, 800);
 }
 
-function pararPolling() {
-  if (pollingInterval) clearInterval(pollingInterval);
+async function gestionarFiDeJoc(sala) {
+  if (!sala.guanyador) return;
+  if (fiDeJocGestionat) return;
+  fiDeJocGestionat = true;
+
+  clearInterval(pollingInterval);
+  habilitarTabla(false);
+
+  const missatge = sala.guanyador === IdJugador
+    ? 'Has guanyat!'
+    : `Ha guanyat ${sala.guanyador}`;
+
+  // estat final o timeout 3s
+  const estatFinal = await Promise.race([
+    fetch(`/joc/state/${IdSala}?t=${Date.now()}`).then(r => r.json()),
+    new Promise(resolve => setTimeout(() => resolve(sala), 3000))
+  ]);
+
+  //guardar resultat i fer leave EN PARAL·LEL
+  await Promise.all([
+    fetch('/joc/resultat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        IdSala,
+        guanyador: estatFinal.guanyador,
+        puntuacions: estatFinal.puntuacions
+      })
+    }),
+    fetch('/joc/leave', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ IdJugador })
+    })
+  ]);
+
+  const reiniciar = confirm(`${missatge}\n\nVols jugar de nou?`);
+  if (reiniciar) {
+    IdSala = null;
+    renderTabla(Array(6).fill(null).map(() => Array(5).fill(null)));
+    unirseSala();
+  }
 }
 
 function renderTabla(tabla) {
@@ -79,11 +143,9 @@ function renderTabla(tabla) {
     for (let j = 0; j < tabla[i].length; j++) {
       const celda = document.querySelector(`td[data-row='${i}'][data-col='${j}']`);
       if (!celda) continue;
-      if (tabla[i][j]) {
-        celda.style.backgroundColor = tabla[i][j] === IdJugador ? 'blue' : 'red';
-      } else {
-        celda.style.backgroundColor = 'white';
-      }
+      celda.style.backgroundColor = tabla[i][j]
+        ? (tabla[i][j] === IdJugador ? 'blue' : 'red')
+        : '';
     }
   }
 }
@@ -95,14 +157,11 @@ function actualizarPuntuaciones(puntuacions) {
 document.addEventListener('click', (e) => {
   const td = e.target.closest('td[data-row]');
   if (!td) return;
-  const fila = parseInt(td.dataset.row);
-  const col = parseInt(td.dataset.col);
-  moverCelda(fila, col);
+  moverCelda(parseInt(td.dataset.row), parseInt(td.dataset.col));
 });
 
-//Avisa al servidor al cerrar la pestaña
 window.addEventListener('beforeunload', () => {
-  pararPolling();
+  clearInterval(pollingInterval);
   const xhr = new XMLHttpRequest();
   xhr.open("POST", "/joc/leave");
   xhr.setRequestHeader("Content-Type", "application/json");
