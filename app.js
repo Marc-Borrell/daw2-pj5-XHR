@@ -9,6 +9,10 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const jocRouter = require('./routes/joc');
 
+// connexio BDs
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://root:root@127.0.0.1:27017/pj5?authSource=admin');
+
 var app = express();
 
 app.set('views', path.join(__dirname, 'views'));

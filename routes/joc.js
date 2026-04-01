@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { unirseSala, sortirSala, ReclamarCelda, getSala } = require('../public/javascripts/sales');
+const { Partida, Jugador } = require('../models/models');
 
 router.post('/join', (req, res) => {
   const { IdJugador } = req.body;
@@ -47,10 +48,43 @@ router.post('/move', (req, res) => {
   });
 });
 
-router.post('/resultat', (req, res) => {
+router.post('/resultat', async (req, res) => {
+  //console.log("BODY:", req.body);
+
   const { IdSala, guanyador, puntuacions } = req.body;
-  console.log(`Partida ${IdSala} acabada. Guanyador: ${guanyador}`, puntuacions);
-  res.json({ ok: true });
+
+  try {
+    if (!IdSala || !guanyador || !puntuacions) {
+      //console.log("Datos incompletos");
+      return res.status(400).json({ error: 'Datos incompletos' });
+    }
+
+    //console.log("Guardando partida...");
+    await Partida.create({ IdSala, guanyador, puntuacions });
+    //console.log("Guardado en Mongo");
+
+    const jugadors = Object.keys(puntuacions);
+
+    await Promise.all(jugadors.map(IdJugador =>
+      Jugador.findOneAndUpdate(
+        { IdJugador },
+        {
+          $inc: {
+            totalPartides: 1,
+            victories: IdJugador === guanyador ? 1 : 0,
+            derrotes:  IdJugador === guanyador ? 0 : 1
+          }
+        },
+        { upsert: true, new: true }
+      )
+    ));
+
+    res.json({ ok: true });
+
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({ error: 'Error guardant partida' });
+  }
 });
 
 router.get('/state/:IdSala', (req, res) => {

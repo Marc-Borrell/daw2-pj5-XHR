@@ -5,6 +5,41 @@ block content
 
   h1= title
   p Welcome to #{title}
+
+  h2 Classificació de jugadors
+  table(border='1', cellpadding='8')
+    thead
+      tr
+        th Jugador
+        th Victòries
+        th Derrotes
+        th Total partides
+    tbody
+      each j in jugadors
+        tr
+          td= j.IdJugador
+          td= j.victories
+          td= j.derrotes
+          td= j.totalPartides
+
+  h2 Últimes partides
+  table(border='1', cellpadding='8')
+    thead
+      tr
+        th Sala
+        th Guanyador
+        th Puntuacions
+        th Data
+    tbody
+      each p in partides
+        tr
+          td= p.IdSala
+          td= p.guanyador
+          td
+            each val, key in p.puntuacions
+              span #{key}: #{val}  
+          td= p.dataFi.toLocaleDateString('ca-ES') 
+  br
   include taula.pug
   script(src='/javascripts/XHR.js') 
       
