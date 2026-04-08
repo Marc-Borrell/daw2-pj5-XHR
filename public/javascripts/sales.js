@@ -7,7 +7,8 @@ function crearSala(IdJugador) {
     jugadors: [IdJugador],
     tabla: Array(6).fill(null).map(() => Array(5).fill(null)),
     puntuacions: { [IdJugador]: 0 },
-    guanyador: null
+    guanyador: null,
+    ultimaActivitat: Date.now()
   };
   sales.set(IdSala, sala);
   return sala;
@@ -46,6 +47,7 @@ function ReclamarCelda(IdSala, fila, col, IdJugador) {
   if (sala.tabla[fila][col] !== null) return false;
   sala.tabla[fila][col] = IdJugador;
   sala.puntuacions[IdJugador]++;
+  sala.ultimaActivitat= Date.now();
 
    //detectar fin de partida
   const totalCeldas = sala.tabla.length * sala.tabla[0].length; // 30

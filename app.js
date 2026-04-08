@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+require('dotenv').config();
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -9,9 +10,10 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const jocRouter = require('./routes/joc');
 
+
 // connexio BDs
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://root:root@127.0.0.1:27017/pj5?authSource=admin');
+mongoose.connect(process.env.MONGODB_URI);
 
 var app = express();
 
