@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+require('dotenv').config();
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -8,6 +9,11 @@ const bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const jocRouter = require('./routes/joc');
+
+
+// connexio BDs
+const mongoose = require('mongoose');
+mongoose.connect(process.env.MONGODB_URI);
 
 var app = express();
 
@@ -26,6 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/joc', jocRouter);
+
 
 app.use(function(req, res, next) {
   next(createError(404));

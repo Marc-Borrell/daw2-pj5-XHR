@@ -1,10 +1,50 @@
 extends layout
-  
 
 block content
+  header
+    h1 PJ5
+    p Sistema de joc multijugador
 
-  h1= title
-  p Welcome to #{title}
-  include taula.pug
-  script(src='/javascripts/XHR.js') 
-      
+  .disposicio
+    .targeta
+      h2 Classificació
+      table
+        thead
+          tr
+            th Jugador
+            th Victòries  
+            th Derrotes
+            th Total partides
+        tbody
+          each j in jugadors
+            tr
+              td= j.IdJugador
+              td= j.victories
+              td= j.derrotes
+              td= j.totalPartides
+
+    .targeta
+      h2 Últimes partides
+      table
+        thead
+          tr
+            th Sala
+            th Guanyador
+            th Puntuacions
+            th Data
+        tbody
+          each p in partides
+            tr
+              td= p.IdSala
+              td
+                span.insignia-guanyador= p.guanyador
+              td
+                each val, key in p.puntuacions
+                  span.pindola-puntuacio #{key} #{val}
+              td= p.dataFi.toLocaleDateString('ca-ES')
+
+  .seccio-joc
+    h2 Tauler de joc
+    include taula.pug
+
+  script(src='/javascripts/XHR.js')

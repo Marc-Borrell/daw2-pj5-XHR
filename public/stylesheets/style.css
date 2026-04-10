@@ -1,44 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600&display=swap');
+
 :root {
-    --sala1-jugador1: #ff8e00;
-    --sala1-jugador2: #2a10d8;
-    --sala2-jugador1: #e44ea3;
-    --sala2-jugador2: #7cf072;
-    --sala3-jugador1: #fffa2e;
-    --sala3-jugador2: #724cfb;
+  --fons: #0f0f0f;
+  --superficie: #1a1a1a;
+  --vora: #2a2a2a;
+  --text: #e8e8e8;
+  --apagat: #888;
+  --accent: #c8f060;
+  --blau: #4a9eff;
+  --vermell: #ff5c5c;
 }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    padding: 50px;
-    font:
-        30px "Lucida Grande",
-        Helvetica,
-        Arial,
-        sans-serif;
+  background: var(--fons);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  min-height: 100vh;
+  padding: 2rem;
 }
 
-a {
-    color: #00b7ff;
+header {
+  border-bottom: 1px solid var(--vora);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.sala1-j1 {
-    background-color: var(--sala1-jugador1);
+header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--accent);
 }
 
-.sala1-j2 {
-    background-color: var(--sala1-jugador2);
+header p {
+  color: var(--apagat);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
 }
 
-.sala2-j1 {
-    background-color: var(--sala2-jugador1);
+.disposicio {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
 }
 
-.sala2-j2 {
-    background-color: var(--sala2-jugador2);
-}
-.sala3-j1 {
-    background-color: var(--sala3-jugador1);
+.targeta {
+  background: var(--superficie);
+  border: 1px solid var(--vora);
+  border-radius: 12px;
+  padding: 1.5rem;
 }
 
-.sala3-j2 {
-    background-color: var(--sala3-jugador2);
+.targeta h2 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--apagat);
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.85rem;
+}
+
+thead th {
+  text-align: left;
+  color: var(--apagat);
+  font-size: 0.75rem;
+  font-weight: 400;
+  padding: 0 0.75rem 0.75rem;
+  border-bottom: 1px solid var(--vora);
+}
+
+tbody td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--vora);
+  color: var(--text);
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+.insígnia-guanyador {
+  background: var(--accent);
+  color: #0f0f0f;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.píndola-puntuació {
+  display: inline-block;
+  background: rgba(255,255,255,0.07);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-right: 4px;
+  font-size: 0.8rem;
+}
+
+.seccio-joc {
+  margin-top: 2rem;
+}
+
+.seccio-joc h2 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--apagat);
+  margin-bottom: 1rem;
+}
+
+.-tablaEntera {
+  border-collapse: collapse;
+  background: var(--superficie);
+  border: 1px solid var(--vora);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.-cell {
+  width: 80px;
+  height: 60px;
+  border: 1px solid var(--vora);
+  cursor: pointer;
+  transition: background 0.15s;
 }
